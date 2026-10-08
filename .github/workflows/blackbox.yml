@@ -1,0 +1,36 @@
+name: Run Blackbox Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch: # Allows manual trigger from the Actions tab
+
+jobs:
+  blackbox-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Run Services (Docker Compose)
+        run: |
+          # Replace this with your actual command to start the application/blackbox service
+          docker compose up -d --build
+
+      - name: Run Blackbox Tests
+        run: |
+          # Replace with your test script or runner command (e.g., pytest, npm test, etc.)
+          echo "Running blackbox checks..."
+          # Example curl check against a running service:
+          # curl --fail http://localhost:8080/health
+
+      - name: Teardown Services
+        if: always()
+        run: |
+          docker compose down
