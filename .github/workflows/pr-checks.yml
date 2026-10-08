@@ -15,8 +15,10 @@ jobs:
          fail: true
         
       - name: Lint YAML
-        uses: ibiqlik/action-yamllint@v3.2.0
-        with: { file_or_dir: k8s/ }
+        uses: ibiqlik/action-yamllint@v4
+        with:
+           file_or-dir: k8s/
       - name: Dockerfile Lint
         uses: hadolint/hadolint-action@v3.1.0
-        with: { dockerfile: docker/ }
+        with: 
+          dockerfile: docker/ 
