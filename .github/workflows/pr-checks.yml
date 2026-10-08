@@ -1,24 +1,33 @@
 name: PR Checks
+
 on:
   push:
-  
-    branches: [ main, release/* ]
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
 jobs:
   validate:
     runs-on: ubuntu-latest
+
+    env:
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Secret Scan
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Lint Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+
+      - name: Lint YAML
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          file_or_dir: k8s/
+
+      - name: Trufflehog Secret Scan
         uses: trufflesecurity/trufflehog@v3.88.0
         with:
-         path: .
-         fail: true
-        
-      - name: Lint YAML
-        uses: ibiqlik/action-yamllint@v4
-        with:
-           file_or-dir: k8s/
-      - name: Dockerfile Lint
-        uses: hadolint/hadolint-action@v3.1.0
-        with: 
-          dockerfile: docker/ 
+          path: .
+          fail: true
