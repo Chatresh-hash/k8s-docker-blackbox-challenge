@@ -9,11 +9,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Secret Scan
-        uses: trufflesecurity/trufflehog@v3
-        with: { path: ., fail: true }
+        uses: trufflesecurity/trufflehog@v3.88.0      with: { path: ., fail: true }
       - name: Lint YAML
-        uses: ibiqlik/action-yamllint@v3
+        uses: ibiqlik/action-yamllint@v3.2.0
         with: { file_or_dir: k8s/ }
       - name: Dockerfile Lint
-        uses: hadolint/hadolint-action@v3
+        uses: hadolint/hadolint-action@v3.1.0
         with: { dockerfile: docker/ }
