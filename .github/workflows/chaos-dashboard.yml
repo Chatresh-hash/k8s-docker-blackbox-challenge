@@ -1,0 +1,18 @@
+name: Chaos Dashboard
+on:
+  schedule: [ { cron: "0 4 * * 1" } ]
+  workflow_dispatch:
+jobs:
+  dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          echo "# Chaos Dashboard - Week $(date +%U)" > docs/chaos-dashboard.md
+          echo "| Date | Scenario | Rollback | Recovery | Outcome |" >> docs/chaos-dashboard.md
+          echo "|------|----------|----------|----------|---------|" >> docs/chaos-dashboard.md
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/chaos-dashboard.md
+          git commit -m "docs: update chaos dashboard"
+          git push

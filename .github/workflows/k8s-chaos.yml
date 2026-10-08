@@ -1,0 +1,20 @@
+name: Chaos Injection
+on:
+  workflow_dispatch:
+  schedule: [ { cron: "0 3 * * 0" } ]
+jobs:
+  chaos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: azure/setup-kubectl@v3
+        with: { version: 'v1.29.0' }
+      - run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
+      - run: kubectl delete pod -l app=account-service --force
+      - run: kubectl apply -f istio/fault-injection.yaml
+      - run: |
+          if ! kubectl rollout status deployment/account-service --timeout=60s; then
+            kubectl rollout undo deployment/account-service
+            echo "ROLLBACK_TRIGGERED=true" >> $GITHUB_ENV
+          fi

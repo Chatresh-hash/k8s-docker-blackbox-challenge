@@ -1,0 +1,36 @@
+name: Repo Status Check
+
+on:
+  workflow_dispatch:   # Trigger manually from GitHub Actions UI
+
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Check Git pre-push hook
+        run: |
+          if [ -f .git/hooks/pre-push ]; then
+            echo "✅ Pre-push hook is present."
+          else
+            echo "❌ Pre-push hook is missing."
+          fi
+
+      - name: Check sample release tag
+        run: |
+          if git rev-parse v0.1.0 >/dev/null 2>&1; then
+            echo "✅ Sample tag v0.1.0 exists."
+          else
+            echo "❌ Sample tag v0.1.0 not found."
+          fi
+
+      - name: Check secrets placeholders
+        run: |
+          if [ -f .github/secrets.env ]; then
+            echo "✅ secrets.env file exists."
+            cat .github/secrets.env
+          else
+            echo "❌ secrets.env file not found."
+          fi

@@ -1,0 +1,24 @@
+name: Deploy to Kubernetes
+on:
+  push:
+    tags: [ 'v*' ]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-kubectl@v3
+        with: { version: 'v1.29.0' }
+      - run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
+      - run: |
+          TAG=${GITHUB_REF##*/}
+          kubectl set image deployment/account-service account-service=docker.io/yourorg/account-service:$TAG
+      - run: |
+          set -e
+          if ! kubectl rollout status deployment/account-service --timeout=60s; then
+            kubectl rollout undo deployment/account-service
+            echo "ROLLBACK_TRIGGERED=true" >> $GITHUB_ENV
+            exit 1
+          fi
